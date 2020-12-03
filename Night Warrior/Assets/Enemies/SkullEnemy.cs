@@ -41,8 +41,14 @@ public class SkullEnemy : MonoBehaviour
             _collisionCount = 10;
         }
         if (collision.collider.CompareTag("Player")) {
-            Destroy(collision.collider.gameObject);
-            GameEvents.InvokeResetPlayer();
+            if (! collision.collider.GetComponent<Player>()._super) {
+                GameEvents.InvokeResetPlayer();
+                GameEvents.InvokeScoreIncreased(-50);
+            }
+            else {
+                collision.collider.GetComponent<Player>()._super = false;
+                this.gameObject.SetActive(false);
+            }
         }
     }
 

@@ -9,6 +9,10 @@ TagManager:
   - KillEnemyBounce
   - KillPlayerDestroy
   - Checkpoint
+  - KillEnemyBounceBoss
+  - Portal1
+  - Portal2
+  - Super
   layers:
   - Default
   - TransparentFX

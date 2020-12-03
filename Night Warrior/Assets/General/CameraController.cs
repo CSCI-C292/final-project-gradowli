@@ -17,7 +17,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if (! _gameOver){
+        if (! _gameOver && _player != null){
             transform.position = new Vector3(Math.Max(0, _player.transform.position.x), 0, -10);
         } 
         else {
