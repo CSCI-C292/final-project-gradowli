@@ -9,8 +9,7 @@ public class PumpkinBoss : MonoBehaviour
     float _gravity = -8f;
     float _verticalVelocity = 0f;
     bool _grounded = false;
-    int _groundedCount = 0;
-    int _shotCount = 300;
+    int _shotCount = 0;
     [SerializeField] GameObject _shotPrefab;  
     // Start is called before the first frame update
     void Awake()
@@ -35,16 +34,13 @@ public class PumpkinBoss : MonoBehaviour
             GameObject bottomShot = Instantiate(_shotPrefab, new Vector3(transform.position.x - 1.5f, transform.position.y - 1, 0f), Quaternion.identity);
             topShot.GetComponent<PumpkinShot>()._verticalVelocity = 2f;
             bottomShot.GetComponent<PumpkinShot>()._verticalVelocity = -2f;
-            _shotCount = 300;
+            _shotCount = 200;
         }
 
-        if (_groundedCount == 0) {
-            _grounded = Physics.Raycast(transform.GetChild(0).transform.position, -Vector3.up, transform.GetChild(0).GetComponent<BoxCollider>().bounds.extents.y + 0.2f);
-        }
+        _grounded = Physics.Raycast(transform.GetChild(0).transform.position, -Vector3.up, transform.GetChild(0).GetComponent<BoxCollider>().bounds.extents.y + 0.2f);
         _verticalVelocity += _gravity * Time.deltaTime;
         if (_grounded) {
             _verticalVelocity = 0f;
-            _groundedCount = 20;
         }
 
         if (_jumpCount == 0 && _grounded) {
@@ -61,9 +57,6 @@ public class PumpkinBoss : MonoBehaviour
         if (_jumpCount > 0) {
             _jumpCount--;
         }
-        if (_groundedCount > 0) {
-            _groundedCount--;
-        }
         if (_shotCount > 0) {
             _shotCount--;
         }
@@ -71,16 +64,7 @@ public class PumpkinBoss : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision collision) {
-        if (collision.collider.CompareTag("Player")) {
-            if (! collision.collider.GetComponent<Player>()._super) {
-                GameEvents.InvokeResetPlayer();
-                GameEvents.InvokeScoreIncreased(-50);
-            }
-            else {
-                collision.collider.GetComponent<Player>()._super = false;
-                this.gameObject.SetActive(false);
-            }
-        }
+        
     }
 
     void OnResetPlayer(object sender, EventArgs args) {

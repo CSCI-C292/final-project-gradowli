@@ -93,9 +93,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.36601985
-  m_Height: 1.2139041
+  m_Height: 1.0340962
   m_Direction: 1
-  m_Center: {x: 0.009179592, y: -0.09184583, z: 0}
+  m_Center: {x: 0.009179592, y: -0.18174991, z: 0}
 --- !u!1 &1246531108114946358
 GameObject:
   m_ObjectHideFlags: 0
@@ -138,8 +138,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.46299946, y: 0.17338562, z: 1}
-  m_Center: {x: 0.5301158, y: -0.027554035, z: 0}
+  m_Size: {x: 0.66516745, y: 0.13967133, z: 1}
+  m_Center: {x: 0.5368547, y: -0.044411182, z: 0}
 --- !u!1 &1246531108278571263
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,5 +200,5 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 120
+  m_Constraints: 124
   m_CollisionDetection: 0

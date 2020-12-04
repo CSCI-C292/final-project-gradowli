@@ -27,16 +27,6 @@ public class PumpkinShot : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision collision) {
-        if (collision.collider.CompareTag("Player")) {
-            if (! collision.collider.GetComponent<Player>()._super) {
-                GameEvents.InvokeResetPlayer();
-                GameEvents.InvokeScoreIncreased(-50);
-            }
-            else {
-                collision.collider.GetComponent<Player>()._super = false;
-                this.gameObject.SetActive(false);
-            }
-        }
         Destroy(transform.gameObject);
     }
 

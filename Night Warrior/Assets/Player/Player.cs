@@ -19,8 +19,7 @@ public class Player : MonoBehaviour
     int _bounceCount = 0;
     public bool _super = false;
     int _portalCooldown = 0;
-    
-    CharacterController controller;
+    int _groundedCount = 0;
 
     void Awake() {
         GameEvents.ResetPlayer += OnResetPlayer;
@@ -29,7 +28,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        controller = GetComponent<CharacterController>();
+
     }
 
     // Update is called once per frame
@@ -44,13 +43,57 @@ public class Player : MonoBehaviour
 
         _horizontalVelocity = 1.5f * Input.GetAxis("Horizontal");
 
-        _grounded = controller.isGrounded;
+        _grounded = Physics.Raycast(transform.position, -Vector3.up, transform.GetComponent<BoxCollider>().bounds.extents.y + 0f);
 
         _verticalVelocity += _gravity * Time.deltaTime;
+
+        if (_verticalVelocity > 0) {
+            for (float i = 0; i < transform.GetComponent<BoxCollider>().bounds.extents.x; i += transform.GetComponent<BoxCollider>().bounds.extents.x/5) {
+                if (Physics.Raycast(transform.position - new Vector3(i, 0, 0), Vector3.up, transform.GetComponent<BoxCollider>().bounds.extents.y + 0.02f)) {
+                    _verticalVelocity = 0f;
+                    _ceilingCount = 20;
+                }
+                if (Physics.Raycast(transform.position + new Vector3(i, 0, 0), Vector3.up, transform.GetComponent<BoxCollider>().bounds.extents.y + 0.02f)) {
+                    _verticalVelocity = 0f;
+                    _ceilingCount = 20;
+                }
+            }
+        }
+        else if (_groundedCount == 0) {
+            for (float i = 0; i < transform.GetComponent<BoxCollider>().bounds.extents.x; i += transform.GetComponent<BoxCollider>().bounds.extents.x/5) {
+                if (Physics.Raycast(transform.position - new Vector3(i, 0, 0), Vector3.down, transform.GetComponent<BoxCollider>().bounds.extents.y + 0.0f)) {
+                    _grounded = true;
+                }
+                if (Physics.Raycast(transform.position + new Vector3(i, 0, 0), Vector3.down, transform.GetComponent<BoxCollider>().bounds.extents.y + 0.00f)) {
+                    _grounded = true;
+                }
+            }
+        }
 
         if (_grounded && _bounceCount == 0) {
             _verticalVelocity = 0f;
             _jumping = false;
+        }
+
+        if (_horizontalVelocity > 0) {
+            for (float i = 0; i < transform.GetComponent<BoxCollider>().bounds.extents.y; i += transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
+                if (Physics.Raycast(transform.position - new Vector3(0, i, 0), Vector3.right, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                _horizontalVelocity = 0f;
+                }
+                if (Physics.Raycast(transform.position + new Vector3(0, i, 0), Vector3.right, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                _horizontalVelocity = 0f;
+                }
+            }
+        }
+        else {
+            for (float i = 0; i < transform.GetComponent<BoxCollider>().bounds.extents.y; i += transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
+                if (Physics.Raycast(transform.position - new Vector3(0, i, 0), Vector3.left, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                _horizontalVelocity = 0f;
+                }
+                if (Physics.Raycast(transform.position + new Vector3(0, i, 0), Vector3.left, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                _horizontalVelocity = 0f;
+                }
+            }
         }
 
         _c = Input.GetKeyDown("c");
@@ -58,6 +101,7 @@ public class Player : MonoBehaviour
         if (! _jumping && _c) {
             _verticalVelocity = _jumpHeight;
             _jumping = true;
+            _grounded = false; 
         }
 
         Movement();
@@ -79,16 +123,11 @@ public class Player : MonoBehaviour
         Vector3 upDownMovementVector = transform.up * _verticalVelocity;
         Vector3 movementVector = sidewaysMovementVector + upDownMovementVector;
         
-        GetComponent<CharacterController>().Move(movementVector * _moveSpeed * Time.deltaTime);
+        transform.position += movementVector * _moveSpeed * Time.deltaTime;
     }
 
-    void OnControllerColliderHit(ControllerColliderHit collider) {
-        if (_ceilingCount == 0 && (controller.collisionFlags & CollisionFlags.Above) != 0) { //stops upward velocity if player hits head
-            _verticalVelocity = 0f;
-            _ceilingCount = 20;
-        }
-
-        if (collider.transform.CompareTag("KillPlayer")){
+    void OnCollisionEnter(Collision collision) {
+        if (collision.collider.transform.CompareTag("KillPlayer")){
             if (! _super) {
                 GameEvents.InvokeScoreIncreased(-50);
                 GameEvents.InvokeResetPlayer();
@@ -97,63 +136,61 @@ public class Player : MonoBehaviour
                 _super = false;
             }
         }
-        else if (collider.transform.CompareTag("KillPlayerDestroy")){
+        else if (collision.collider.transform.CompareTag("KillPlayerDestroy")){
             if (! _super) {
                 GameEvents.InvokeScoreIncreased(-50);
-                Destroy(collider.gameObject);
+                Destroy(collision.collider.gameObject);
                 GameEvents.InvokeResetPlayer();
             }
             else {
                 _super = false;
             }
         }
-        else if (collider.transform.CompareTag("KillEnemyBounce")) {
-            collider.transform.parent.gameObject.SetActive(false);
+        else if (collision.collider.transform.CompareTag("KillEnemyBounce")) {
+            collision.collider.transform.parent.gameObject.SetActive(false);
             GameEvents.InvokeScoreIncreased(20);
             _verticalVelocity = _bounceHeight;
             _jumping = true;
             _bounceCount = 10;
         }
-        else if (collider.transform.CompareTag("KillEnemyBounceBoss")) {
-            collider.transform.parent.gameObject.SetActive(false);
+        else if (collision.collider.transform.CompareTag("KillEnemyBounceBoss")) {
+            collision.collider.transform.parent.gameObject.SetActive(false);
             GameEvents.InvokeScoreIncreased(100);
             _verticalVelocity = _bounceHeight;
             _jumping = true;
             _bounceCount = 10;
         }
-        else if (collider.transform.CompareTag("Checkpoint")) {
-            collider.gameObject.GetComponent<BossCheckpoint>().ActivateBoss();
-            collider.gameObject.SetActive(false);
+        else if (collision.collider.transform.CompareTag("Checkpoint")) {
+            collision.collider.gameObject.GetComponent<BossCheckpoint>().ActivateBoss();
+            collision.collider.gameObject.SetActive(false);
         }
-        else if (_portalCooldown == 0 && collider.transform.CompareTag("Portal1")) {
-            _portalCooldown = 20;
+        else if (_portalCooldown == 0 && collision.collider.transform.CompareTag("Portal1")) {
             _verticalVelocity = 0f;
             _horizontalVelocity = 0f;
-            if (this.transform.position.x < collider.transform.position.x) {
-                this.transform.position = new Vector3(collider.transform.parent.GetChild(1).gameObject.transform.position.x + 1,
-                                                    collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
+            if (this.transform.position.x < collision.collider.transform.position.x) {
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(1).gameObject.transform.position.x + 1,
+                                                    collision.collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
             }
             else {
-                this.transform.position = new Vector3(collider.transform.parent.GetChild(1).gameObject.transform.position.x - 1,
-                                                    collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(1).gameObject.transform.position.x - 1,
+                                                    collision.collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
             }
         }
-        else if (_portalCooldown == 0 && collider.transform.CompareTag("Portal2")) {
+        else if (_portalCooldown == 0 && collision.collider.transform.CompareTag("Portal2")) {
             _verticalVelocity = 0f;
             _horizontalVelocity = 0f;
-            _portalCooldown = 20;
-            if (this.transform.position.x < collider.transform.position.x) {
-                this.transform.position = new Vector3(collider.transform.parent.GetChild(0).gameObject.transform.position.x + 1,
-                                                    collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
+            if (this.transform.position.x < collision.collider.transform.position.x) {
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(0).gameObject.transform.position.x + 1,
+                                                    collision.collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
             }
             else {
-                this.transform.position = new Vector3(collider.transform.parent.GetChild(0).gameObject.transform.position.x - 1,
-                                                    collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(0).gameObject.transform.position.x - 1,
+                                                    collision.collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
             }
         }
-        else if (collider.transform.CompareTag("Super")) {
+        else if (collision.collider.transform.CompareTag("Super")) {
             _super = true;
-            collider.gameObject.SetActive(false);
+            collision.collider.gameObject.SetActive(false);
         }
     }
 
