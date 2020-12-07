@@ -13,6 +13,8 @@ TagManager:
   - Portal1
   - Portal2
   - Super
+  - KillPlayerBoss
+  - Ammo
   layers:
   - Default
   - TransparentFX

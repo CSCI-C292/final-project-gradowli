@@ -34,7 +34,7 @@ public class PumpkinBoss : MonoBehaviour
             GameObject bottomShot = Instantiate(_shotPrefab, new Vector3(transform.position.x - 1.5f, transform.position.y - 1, 0f), Quaternion.identity);
             topShot.GetComponent<PumpkinShot>()._verticalVelocity = 2f;
             bottomShot.GetComponent<PumpkinShot>()._verticalVelocity = -2f;
-            _shotCount = 200;
+            _shotCount = 100;
         }
 
         _grounded = Physics.Raycast(transform.GetChild(0).transform.position, -Vector3.up, transform.GetChild(0).GetComponent<BoxCollider>().bounds.extents.y + 0.2f);

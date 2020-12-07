@@ -16,7 +16,7 @@ public class GameState : MonoBehaviour
     GameObject _currentPlayer;
     float _xSpawn = -7.906882f;
     float _ySpawn = -3.527989f;
-    int _lives = 2;
+    int _lives = 3;
     int _score = 0;
     int _maxTime = 100;
     int _time;

@@ -6,6 +6,7 @@ using System;
 public class Player : MonoBehaviour
 {
 
+    [SerializeField] GameObject _shotPrefab;
     float _moveSpeed = 4f;
     float _jumpHeight = 3f;
     float _bounceHeight = 1.5f;
@@ -15,11 +16,13 @@ public class Player : MonoBehaviour
     bool _grounded = false;
     bool _jumping = true;
     bool _c = false;
+    bool _x = false;
     int _ceilingCount = 0;
     int _bounceCount = 0;
     public bool _super = false;
     int _portalCooldown = 0;
     int _groundedCount = 0;
+    int _shotCount = 0;
 
     void Awake() {
         GameEvents.ResetPlayer += OnResetPlayer;
@@ -97,11 +100,17 @@ public class Player : MonoBehaviour
         }
 
         _c = Input.GetKeyDown("c");
+        _x = Input.GetKeyDown("x");
 
         if (! _jumping && _c) {
             _verticalVelocity = _jumpHeight;
             _jumping = true;
             _grounded = false; 
+        }
+
+        if (_x && _shotCount > 0) {
+            --_shotCount;
+            Instantiate(_shotPrefab, new Vector3(transform.position.x + 1, transform.position.y, 0f), Quaternion.identity);
         }
 
         Movement();
@@ -127,7 +136,7 @@ public class Player : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision collision) {
-        if (collision.collider.transform.CompareTag("KillPlayer")){
+        if (collision.collider.transform.CompareTag("KillPlayer") || collision.collider.transform.CompareTag("KillPlayerBoss")){
             if (! _super) {
                 GameEvents.InvokeScoreIncreased(-50);
                 GameEvents.InvokeResetPlayer();
@@ -190,6 +199,82 @@ public class Player : MonoBehaviour
         }
         else if (collision.collider.transform.CompareTag("Super")) {
             _super = true;
+            collision.collider.gameObject.SetActive(false);
+        }
+        else if (collision.collider.transform.CompareTag("Ammo")){
+            _shotCount = 3;
+            collision.collider.gameObject.SetActive(false);
+        }
+    }
+
+    void OnCollisionStay(Collision collision) {
+        if (collision.collider.transform.CompareTag("KillPlayer") || collision.collider.transform.CompareTag("KillPlayerBoss")){
+            if (! _super) {
+                GameEvents.InvokeScoreIncreased(-50);
+                GameEvents.InvokeResetPlayer();
+            }
+            else {
+                _super = false;
+            }
+        }
+        else if (collision.collider.transform.CompareTag("KillPlayerDestroy")){
+            if (! _super) {
+                GameEvents.InvokeScoreIncreased(-50);
+                Destroy(collision.collider.gameObject);
+                GameEvents.InvokeResetPlayer();
+            }
+            else {
+                _super = false;
+            }
+        }
+        else if (collision.collider.transform.CompareTag("KillEnemyBounce")) {
+            collision.collider.transform.parent.gameObject.SetActive(false);
+            GameEvents.InvokeScoreIncreased(20);
+            _verticalVelocity = _bounceHeight;
+            _jumping = true;
+            _bounceCount = 10;
+        }
+        else if (collision.collider.transform.CompareTag("KillEnemyBounceBoss")) {
+            collision.collider.transform.parent.gameObject.SetActive(false);
+            GameEvents.InvokeScoreIncreased(100);
+            _verticalVelocity = _bounceHeight;
+            _jumping = true;
+            _bounceCount = 10;
+        }
+        else if (collision.collider.transform.CompareTag("Checkpoint")) {
+            collision.collider.gameObject.GetComponent<BossCheckpoint>().ActivateBoss();
+            collision.collider.gameObject.SetActive(false);
+        }
+        else if (_portalCooldown == 0 && collision.collider.transform.CompareTag("Portal1")) {
+            _verticalVelocity = 0f;
+            _horizontalVelocity = 0f;
+            if (this.transform.position.x < collision.collider.transform.position.x) {
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(1).gameObject.transform.position.x + 1,
+                                                    collision.collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
+            }
+            else {
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(1).gameObject.transform.position.x - 1,
+                                                    collision.collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
+            }
+        }
+        else if (_portalCooldown == 0 && collision.collider.transform.CompareTag("Portal2")) {
+            _verticalVelocity = 0f;
+            _horizontalVelocity = 0f;
+            if (this.transform.position.x < collision.collider.transform.position.x) {
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(0).gameObject.transform.position.x + 1,
+                                                    collision.collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
+            }
+            else {
+                this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(0).gameObject.transform.position.x - 1,
+                                                    collision.collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
+            }
+        }
+        else if (collision.collider.transform.CompareTag("Super")) {
+            _super = true;
+            collision.collider.gameObject.SetActive(false);
+        }
+        else if (collision.collider.transform.CompareTag("Ammo")){
+            _shotCount = 3;
             collision.collider.gameObject.SetActive(false);
         }
     }

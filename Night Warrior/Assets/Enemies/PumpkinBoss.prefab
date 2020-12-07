@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 1829300208230449826}
   m_Layer: 0
   m_Name: top
-  m_TagString: KillEnemyBounce
+  m_TagString: KillEnemyBounceBoss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 1829300208330286865}
   m_Layer: 0
   m_Name: en_88
-  m_TagString: KillPlayer
+  m_TagString: KillPlayerBoss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

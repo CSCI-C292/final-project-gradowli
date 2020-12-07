@@ -96,6 +96,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4050c57a940a25e429b3c56a2cfca626, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _shotPrefab: {fileID: 251283991170527692, guid: 24eaa62520967df44af9da1c30504c2b,
+    type: 3}
   _super: 0
 --- !u!54 &2055120282809308020
 Rigidbody:
