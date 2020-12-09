@@ -15,6 +15,7 @@ TagManager:
   - Super
   - KillPlayerBoss
   - Ammo
+  - Pushable
   layers:
   - Default
   - TransparentFX

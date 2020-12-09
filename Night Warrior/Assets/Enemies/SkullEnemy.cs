@@ -39,6 +39,12 @@ public class SkullEnemy : MonoBehaviour
         if (_collisionCount == 0) {
             _directionRight = ! _directionRight;
             _collisionCount = 10;
+            if (_directionRight) {
+                gameObject.GetComponentInChildren<SpriteRenderer>().flipX = false;
+            }
+            else {
+                gameObject.GetComponentInChildren<SpriteRenderer>().flipX = true;
+            }
         }
     }
 

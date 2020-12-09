@@ -21,6 +21,7 @@ public class SkeletonBoss : MonoBehaviour
     void Start()
     {
         _maxCount = 100;
+        this.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -59,6 +60,6 @@ public class SkeletonBoss : MonoBehaviour
     }
 
     void OnResetPlayer(object sender, EventArgs args) {
-        this.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
     }
 }

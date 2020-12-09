@@ -17,12 +17,14 @@ public class Player : MonoBehaviour
     bool _jumping = true;
     bool _c = false;
     bool _x = false;
+    bool _v = false;
     int _ceilingCount = 0;
     int _bounceCount = 0;
     public bool _super = false;
     int _portalCooldown = 0;
     int _groundedCount = 0;
     int _shotCount = 0;
+    bool _directionRight = true;
 
     void Awake() {
         GameEvents.ResetPlayer += OnResetPlayer;
@@ -45,6 +47,19 @@ public class Player : MonoBehaviour
         }
 
         _horizontalVelocity = 1.5f * Input.GetAxis("Horizontal");
+
+        if (_horizontalVelocity > 0) {
+            if (! _directionRight) {
+                _directionRight = true;
+                gameObject.GetComponent<SpriteRenderer>().flipX = false;
+            }
+        }
+        else if (_horizontalVelocity < 0) {
+            if (_directionRight) {
+                _directionRight = false;
+                gameObject.GetComponent<SpriteRenderer>().flipX = true;
+            }
+        }
 
         _grounded = Physics.Raycast(transform.position, -Vector3.up, transform.GetComponent<BoxCollider>().bounds.extents.y + 0f);
 
@@ -80,27 +95,96 @@ public class Player : MonoBehaviour
 
         if (_horizontalVelocity > 0) {
             for (float i = 0; i < transform.GetComponent<BoxCollider>().bounds.extents.y; i += transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
-                if (Physics.Raycast(transform.position - new Vector3(0, i, 0), Vector3.right, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
-                _horizontalVelocity = 0f;
+                RaycastHit collision;
+                if (Physics.Raycast(transform.position - new Vector3(0, i, 0), Vector3.right, out collision, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                    if (! collision.collider.transform.CompareTag("Pushable")) {
+                        _horizontalVelocity = 0f;
+                    }
+                    else {
+                        for (float j = 0; j < collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y; j += collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
+                            if (Physics.Raycast(collision.collider.transform.position - new Vector3(0, j, 0), Vector3.right, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                            if (Physics.Raycast(collision.collider.transform.position + new Vector3(0, j, 0), Vector3.right, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                        }
+                    }
                 }
-                if (Physics.Raycast(transform.position + new Vector3(0, i, 0), Vector3.right, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
-                _horizontalVelocity = 0f;
+                if (Physics.Raycast(transform.position + new Vector3(0, i, 0), Vector3.right, out collision, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                    if (! collision.collider.transform.CompareTag("Pushable")) {
+                        _horizontalVelocity = 0f;
+                    }
+                    else {
+                        for (float j = 0; j < collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y; j += collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
+                            if (Physics.Raycast(collision.collider.transform.position - new Vector3(0, j, 0), Vector3.right, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                            if (Physics.Raycast(collision.collider.transform.position + new Vector3(0, j, 0), Vector3.right, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                        }
+                    }
                 }
             }
         }
         else {
             for (float i = 0; i < transform.GetComponent<BoxCollider>().bounds.extents.y; i += transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
-                if (Physics.Raycast(transform.position - new Vector3(0, i, 0), Vector3.left, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
-                _horizontalVelocity = 0f;
+                RaycastHit collision;
+                if (Physics.Raycast(transform.position - new Vector3(0, i, 0), Vector3.left, out collision, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                    if (! collision.collider.transform.CompareTag("Pushable")) {
+                        _horizontalVelocity = 0f;
+                    }
+                    else {
+                        for (float j = 0; j < collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y; j += collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
+                            if (Physics.Raycast(collision.collider.transform.position - new Vector3(0, j, 0), Vector3.left, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                            if (Physics.Raycast(collision.collider.transform.position + new Vector3(0, j, 0), Vector3.left, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                        }
+                    }
                 }
-                if (Physics.Raycast(transform.position + new Vector3(0, i, 0), Vector3.left, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
-                _horizontalVelocity = 0f;
+                if (Physics.Raycast(transform.position + new Vector3(0, i, 0), Vector3.left, out collision, transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                    if (! collision.collider.transform.CompareTag("Pushable")) {
+                        _horizontalVelocity = 0f;
+                    }
+                    else {
+                        for (float j = 0; j < collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y; j += collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.y/5) {
+                            if (Physics.Raycast(collision.collider.transform.position - new Vector3(0, j, 0), Vector3.left, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                            if (Physics.Raycast(collision.collider.transform.position + new Vector3(0, j, 0), Vector3.left, collision.collider.transform.GetComponent<BoxCollider>().bounds.extents.x + 0.02f)) {
+                                _horizontalVelocity = 0f;
+                            }
+                        }
+                    }
                 }
             }
         }
 
         _c = Input.GetKeyDown("c");
         _x = Input.GetKeyDown("x");
+        _v = Input.GetKeyDown("v");
+        
+        if (_v) {
+            RaycastHit collision;
+            if (_directionRight) {
+                if (Physics.Raycast(transform.position, Vector3.right, out collision, transform.GetComponent<BoxCollider>().bounds.extents.x + 1f)) {
+                    if (collision.collider.transform.CompareTag("Pushable")) {
+                        collision.collider.GetComponent<Pushable>().ResetLocation();
+                    }
+                }
+            }
+            else {
+                if (Physics.Raycast(transform.position, Vector3.left, out collision, transform.GetComponent<BoxCollider>().bounds.extents.x + 1f)) {
+                    if (collision.collider.transform.CompareTag("Pushable")) {
+                        collision.collider.GetComponent<Pushable>().ResetLocation();
+                    }
+                }
+            }
+        }
 
         if (! _jumping && _c) {
             _verticalVelocity = _jumpHeight;
@@ -205,6 +289,9 @@ public class Player : MonoBehaviour
             _shotCount = 3;
             collision.collider.gameObject.SetActive(false);
         }
+        else if (collision.collider.transform.CompareTag("Pushable")){
+            collision.collider.GetComponent<Pushable>()._horizontalVelocity = _horizontalVelocity; 
+        }
     }
 
     void OnCollisionStay(Collision collision) {
@@ -276,6 +363,15 @@ public class Player : MonoBehaviour
         else if (collision.collider.transform.CompareTag("Ammo")){
             _shotCount = 3;
             collision.collider.gameObject.SetActive(false);
+        }
+        else if (collision.collider.transform.CompareTag("Pushable")){
+            collision.collider.GetComponent<Pushable>()._horizontalVelocity = _horizontalVelocity;
+        }
+    }
+
+    void OnCollisionExit(Collision collision) {
+        if (collision.collider.transform.CompareTag("Pushable")){
+            collision.collider.GetComponent<Pushable>()._horizontalVelocity = 0f;
         }
     }
 
