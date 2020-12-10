@@ -16,6 +16,7 @@ TagManager:
   - KillPlayerBoss
   - Ammo
   - Pushable
+  - Win
   layers:
   - Default
   - TransparentFX

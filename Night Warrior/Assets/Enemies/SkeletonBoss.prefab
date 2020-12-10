@@ -98,7 +98,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 124
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!65 &8101209836806795712
 BoxCollider:
@@ -111,8 +111,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.5217209, y: 0.7349172, z: 0.2}
-  m_Center: {x: -0.086437225, y: -0.039732248, z: 0}
+  m_Size: {x: 0.5217209, y: 0.83606607, z: 0.2}
+  m_Center: {x: -0.086437225, y: -0.09030667, z: 0}
 --- !u!114 &5178245980804253304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,3 +127,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _axePrefab: {fileID: 3851193473666933487, guid: cbc46dcd439af814c8dadbe126541488,
     type: 3}
+  _skullPrefab: {fileID: 1246531108278571263, guid: 3afdb63f83cc17f488932c0da5ec0815,
+    type: 3}
+  _winObject: {fileID: 0}

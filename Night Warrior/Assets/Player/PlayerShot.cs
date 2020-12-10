@@ -6,7 +6,7 @@ using System;
 public class PlayerShot : MonoBehaviour
 {
     // Start is called before the first frame update
-    float _horizontalVelocity = 8f;
+    public float _horizontalVelocity = 8f;
     // Start is called before the first frame update
     void Awake()
     {

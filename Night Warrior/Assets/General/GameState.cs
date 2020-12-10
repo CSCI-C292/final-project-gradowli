@@ -13,15 +13,18 @@ public class GameState : MonoBehaviour
     [SerializeField] GameObject _livesText;
     [SerializeField] GameObject _playerPrefab;
     [SerializeField] GameObject _level;
+    [SerializeField] GameObject _bossFloor;
     GameObject _currentPlayer;
     float _xSpawn = -7.906882f;
     float _ySpawn = -3.527989f;
     int _lives = 3;
     int _score = 0;
-    int _maxTime = 100;
+    int _maxTime = 200;
     int _time;
     bool _timerBool = true;
     bool _gameOver = false;
+    bool _gameWon = false;
+    bool _timerToScore = false;
 
     public static GameState Instance;
 
@@ -29,6 +32,9 @@ public class GameState : MonoBehaviour
         Instance = this;
         GameEvents.ResetPlayer += OnResetPlayer;
         GameEvents.ScoreIncreased += OnScoreIncreased;
+        GameEvents.PlayerWin += OnPlayerWin;
+        GameEvents.DropBoss += OnDropBoss;
+        GameEvents.StartGameWon += OnStartGameWon;
     }
     // Start is called before the first frame update
     void Start()
@@ -38,24 +44,52 @@ public class GameState : MonoBehaviour
 
     IEnumerator DecreaseTime() {
         yield return new WaitForSeconds(1);
-        if (! _gameOver && _time > 0) {
-            _time--;
-            _timerText.GetComponent<TextMeshProUGUI>().text = "Timer\n" + _time;
-            _timerBool = true;
+        if (! _gameWon) {
+            if (! _gameOver && _time > 0) {
+                _time--;
+                _timerText.GetComponent<TextMeshProUGUI>().text = "Timer\n" + _time;
+                _timerBool = true;
+            }
+            else if (! _gameOver) {
+                _timerBool = true;
+                GameEvents.InvokeResetPlayer();
+                GameEvents.InvokeScoreIncreased(-50);
+            }
         }
-        else if (! _gameOver) {
-            _timerBool = true;
-            GameEvents.InvokeResetPlayer();
-            GameEvents.InvokeScoreIncreased(-50);
-        }
+    }
+
+    IEnumerator EndGame() {
+        yield return new WaitForSeconds(2);
+        _level.SetActive(false);
+        _timerBool = false;
+        _timerText.GetComponent<TextMeshProUGUI>().text = "";
+        _livesText.GetComponent<TextMeshProUGUI>().text = "";
+        _scoreText.GetComponent<TextMeshProUGUI>().text = "";
+        _gameOverText1.GetComponent<TextMeshProUGUI>().text = "GAME OVER";
+        _gameOverText2.GetComponent<TextMeshProUGUI>().text = "YOUR SCORE WAS " + _score;
+        _gameOverText1.SetActive(true);
+        _gameOverText2.SetActive(true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (! _gameOver && _timerBool) {
-            StartCoroutine(DecreaseTime());
-            _timerBool = false;
+        if (! _gameWon) {
+            if (! _gameOver && _timerBool) {
+                StartCoroutine(DecreaseTime());
+                _timerBool = false;
+            }
+        }
+        else if (_timerToScore) {
+            if (_time > 0 ) {
+                IncreaseScore(1);
+                _time--;
+                _timerText.GetComponent<TextMeshProUGUI>().text = "Timer\n" + _time;
+            }
+            else {
+                _timerToScore = false;
+                StartCoroutine(EndGame());
+            }
         }
     }
 
@@ -89,15 +123,18 @@ public class GameState : MonoBehaviour
             _gameOver = true;
             DecreaseLife();
             Camera.main.GetComponent<CameraController>()._gameOver = true;
-            _level.SetActive(false);
-            _timerBool = false;
-            _timerText.GetComponent<TextMeshProUGUI>().text = "";
-            _livesText.GetComponent<TextMeshProUGUI>().text = "";
-            _scoreText.GetComponent<TextMeshProUGUI>().text = "";
-            _gameOverText1.GetComponent<TextMeshProUGUI>().text = "GAME OVER";
-            _gameOverText2.GetComponent<TextMeshProUGUI>().text = "YOUR SCORE WAS " + _score;
-            _gameOverText1.SetActive(true);
-            _gameOverText2.SetActive(true);
+            StartCoroutine(EndGame());
         }
+    }
+    void OnPlayerWin(object sender, EventArgs args) {
+        _gameWon = true;
+    }
+
+    void OnDropBoss(object sender, EventArgs args) {
+        _bossFloor.SetActive(false);
+    }
+
+    void OnStartGameWon(object sender, EventArgs args) {
+        _timerToScore = true;
     }
 }

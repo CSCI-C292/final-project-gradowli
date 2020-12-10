@@ -5,13 +5,16 @@ using System;
 
 public class SkullEnemy : MonoBehaviour
 {
-    bool _directionRight = false;
+    public bool _directionRight = false;
     float _speed = 2f;
     int _collisionCount = 0;
+    public bool _resetOnDeath = true;
+    bool _gameWon = false;
 
     void Awake()
     {
         GameEvents.ResetPlayer += OnResetPlayer;
+        GameEvents.PlayerWin += OnPlayerWin;
     }
     // Start is called before the first frame update
     void Start()
@@ -22,21 +25,22 @@ public class SkullEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_directionRight) {
-            transform.position += new Vector3(_speed * Time.deltaTime, 0, 0);
-        }
-        else {
-            transform.position -= new Vector3(_speed * Time.deltaTime, 0, 0);
-        }
+        if (! _gameWon) {
+            if (_directionRight) {
+                transform.position += new Vector3(_speed * Time.deltaTime, 0, 0);
+            }
+            else {
+                transform.position -= new Vector3(_speed * Time.deltaTime, 0, 0);
+            }
 
-        if (_collisionCount > 0) {
-            --_collisionCount;
+            if (_collisionCount > 0) {
+                --_collisionCount;
+            }
         }
-
     }
 
     void OnCollisionEnter(Collision collision) {
-        if (_collisionCount == 0) {
+        if (_collisionCount == 0 && ! collision.collider.CompareTag("KillPlayerDestroy")) {
             _directionRight = ! _directionRight;
             _collisionCount = 10;
             if (_directionRight) {
@@ -49,6 +53,19 @@ public class SkullEnemy : MonoBehaviour
     }
 
     void OnResetPlayer(object sender, EventArgs args) {
-        this.gameObject.SetActive(true);
+        if (_resetOnDeath) {
+            this.gameObject.SetActive(true);
+        }
+        else {
+            Destroy(this.gameObject);
+        }
+    }
+
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+    }
+
+    void OnPlayerWin(object sender, EventArgs args) {
+        _gameWon = true;
     }
 }
