@@ -43,4 +43,8 @@ public class Ammo : MonoBehaviour
     void OnResetPlayer(object sender, EventArgs args) {
         this.gameObject.SetActive(true);
     }
+
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+    }
 }

@@ -106,4 +106,7 @@ public class Pushable : MonoBehaviour
             transform.position = new Vector3(_startingX, _startingY, 0);
         }
     }
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+    }
 }

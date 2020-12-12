@@ -26,6 +26,8 @@ public class Player : MonoBehaviour
     int _shotCount = 0;
     bool _directionRight = true;
     bool _gameWon = false;
+    int _playerCooldown = 0;
+    
 
     void Awake() {
         GameEvents.ResetPlayer += OnResetPlayer;
@@ -98,14 +100,16 @@ public class Player : MonoBehaviour
                             _jumping = true;
                             _bounceCount = 10;
                         }
-                        else if (collision.collider.transform.CompareTag("KillPlayerDestroy")){
+                        else if ((collision.collider.transform.CompareTag("KillPlayerDestroy")) && _playerCooldown == 0){
                             if (! _super) {
                                 GameEvents.InvokeScoreIncreased(-50);
                                 Destroy(collision.collider.gameObject);
                                 GameEvents.InvokeResetPlayer();
+                                _playerCooldown = 50;
                             }
                             else {
                                 _super = false;
+                                _playerCooldown = 50;
                             }
                         }
                         else if (collision.collider.transform.CompareTag("Super")) {
@@ -135,14 +139,16 @@ public class Player : MonoBehaviour
                             _jumping = true;
                             _bounceCount = 10;
                         }
-                        else if (collision.collider.transform.CompareTag("KillPlayerDestroy")){
+                        else if ((collision.collider.transform.CompareTag("KillPlayerDestroy")) && _playerCooldown == 0){
                             if (! _super) {
                                 GameEvents.InvokeScoreIncreased(-50);
                                 Destroy(collision.collider.gameObject);
                                 GameEvents.InvokeResetPlayer();
+                                _playerCooldown = 50;
                             }
                             else {
                                 _super = false;
+                                _playerCooldown = 50;
                             }
                         }
                         else if (collision.collider.transform.CompareTag("Super")) {
@@ -267,14 +273,16 @@ public class Player : MonoBehaviour
             if (_x && _shotCount > 0) {
                 --_shotCount;
                 if (_directionRight) {
-                    GameObject shot = Instantiate(_shotPrefab, new Vector3(transform.position.x + 1, transform.position.y, 0f), Quaternion.identity);
-                    shot.GetComponent<PlayerShot>()._horizontalVelocity = 8f;
+                    GameObject shot = Instantiate(_shotPrefab, new Vector3(transform.position.x + 1.3f, transform.position.y, 0f), Quaternion.identity);
+                    shot.GetComponent<PlayerShot>()._horizontalVelocity = 12f;
                 }
                 else {
-                    GameObject shot = Instantiate(_shotPrefab, new Vector3(transform.position.x - 1, transform.position.y, 0f), Quaternion.identity);
-                    shot.GetComponent<PlayerShot>()._horizontalVelocity = -8f;
+                    GameObject shot = Instantiate(_shotPrefab, new Vector3(transform.position.x - 1.3f, transform.position.y, 0f), Quaternion.identity);
+                    shot.GetComponent<PlayerShot>()._horizontalVelocity = -12f;
                     shot.GetComponent<PlayerShot>().GetComponent<SpriteRenderer>().flipX = true;
                 }
+                //Some help in learning how to use Audio Source components: https://www.raywenderlich.com/6449-introduction-to-unity-sound
+                this.gameObject.GetComponent<AudioSource>().Play();
             }
 
             Movement();
@@ -288,6 +296,11 @@ public class Player : MonoBehaviour
             if (_portalCooldown > 0) {
                 _portalCooldown--;
             }
+
+            if (_playerCooldown > 0) {
+                _playerCooldown--;
+            }
+
         }
     }
 
@@ -300,26 +313,30 @@ public class Player : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision collision) {
-        if (collision.collider.transform.CompareTag("KillPlayer") || collision.collider.transform.CompareTag("KillPlayerBoss")){
+        if ((collision.collider.transform.CompareTag("KillPlayer") || collision.collider.transform.CompareTag("KillPlayerBoss")) && _playerCooldown == 0){
             if (! _super) {
                 GameEvents.InvokeScoreIncreased(-50);
                 collision.collider.transform.parent.gameObject.SetActive(false);
                 GameEvents.InvokeResetPlayer();
+                _playerCooldown = 50;
             }
             else {
                 _super = false;
                 collision.collider.transform.parent.gameObject.SetActive(false);
+                _playerCooldown = 50;
             }
         }
-        else if (collision.collider.transform.CompareTag("KillPlayerDestroy")){
+        else if ((collision.collider.transform.CompareTag("KillPlayerDestroy")) && _playerCooldown == 0){
             if (! _super) {
                 GameEvents.InvokeScoreIncreased(-50);
                 Destroy(collision.collider.gameObject);
                 GameEvents.InvokeResetPlayer();
+                _playerCooldown = 50;
             }
             else {
                 _super = false;
                 Destroy(collision.collider.gameObject);
+                _playerCooldown = 50;
             }
         }
         else if (collision.collider.transform.CompareTag("KillEnemyBounce")) {
@@ -419,6 +436,7 @@ public class Player : MonoBehaviour
 
     void OnDestroy() {
         GameEvents.ResetPlayer -= OnResetPlayer;
+        GameEvents.PlayerWin -= OnPlayerWin;
     }
     
 }

@@ -25,4 +25,7 @@ public class WinObject : MonoBehaviour
     void OnResetPlayer(object sender, EventArgs args) {
         this.gameObject.SetActive(false);
     }
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+    }
 }

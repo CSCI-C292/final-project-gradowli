@@ -49,4 +49,8 @@ public class CameraController : MonoBehaviour
         _gameOver = true;
         _gameWon = true;
     }
+
+    void OnDestroy() {
+        GameEvents.PlayerWin -= OnPlayerWin;
+    }
 }

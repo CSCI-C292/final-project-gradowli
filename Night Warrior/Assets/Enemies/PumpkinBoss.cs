@@ -66,9 +66,6 @@ public class PumpkinBoss : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision) {
-        
-    }
 
     void OnResetPlayer(object sender, EventArgs args) {
         this.gameObject.SetActive(false);
@@ -76,5 +73,10 @@ public class PumpkinBoss : MonoBehaviour
 
     void OnPlayerWin(object sender, EventArgs args) {
         _gameWon = true;
+    }
+
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+        GameEvents.PlayerWin -= OnPlayerWin;
     }
 }

@@ -63,6 +63,7 @@ public class SkullEnemy : MonoBehaviour
 
     void OnDestroy() {
         GameEvents.ResetPlayer -= OnResetPlayer;
+        GameEvents.PlayerWin -= OnPlayerWin;
     }
 
     void OnPlayerWin(object sender, EventArgs args) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameState : MonoBehaviour
 {
@@ -25,6 +26,7 @@ public class GameState : MonoBehaviour
     bool _gameOver = false;
     bool _gameWon = false;
     bool _timerToScore = false;
+    bool _checkForRestart = false;
 
     public static GameState Instance;
 
@@ -65,10 +67,16 @@ public class GameState : MonoBehaviour
         _timerText.GetComponent<TextMeshProUGUI>().text = "";
         _livesText.GetComponent<TextMeshProUGUI>().text = "";
         _scoreText.GetComponent<TextMeshProUGUI>().text = "";
-        _gameOverText1.GetComponent<TextMeshProUGUI>().text = "GAME OVER";
-        _gameOverText2.GetComponent<TextMeshProUGUI>().text = "YOUR SCORE WAS " + _score;
+        if (! _gameWon) {
+            _gameOverText1.GetComponent<TextMeshProUGUI>().text = "GAME OVER";
+        }
+        else {
+            _gameOverText1.GetComponent<TextMeshProUGUI>().text = "YOU WIN!";
+        }
+        _gameOverText2.GetComponent<TextMeshProUGUI>().text = "Thanks for playing the demo!\nYour score was " + _score + ".\nPress Enter to play again!";
         _gameOverText1.SetActive(true);
         _gameOverText2.SetActive(true);
+        _checkForRestart = true;
     }
 
     // Update is called once per frame
@@ -89,6 +97,11 @@ public class GameState : MonoBehaviour
             else {
                 _timerToScore = false;
                 StartCoroutine(EndGame());
+            }
+        }
+        if(_checkForRestart) {
+            if (Input.GetButtonDown("Submit")) {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
         }
     }
@@ -136,5 +149,13 @@ public class GameState : MonoBehaviour
 
     void OnStartGameWon(object sender, EventArgs args) {
         _timerToScore = true;
+    }
+
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+        GameEvents.ScoreIncreased -= OnScoreIncreased;
+        GameEvents.PlayerWin -= OnPlayerWin;
+        GameEvents.DropBoss -= OnDropBoss;
+        GameEvents.StartGameWon -= OnStartGameWon;
     }
 }

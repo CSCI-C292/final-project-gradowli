@@ -147,4 +147,9 @@ public class SkeletonBoss : MonoBehaviour
     void OnPlayerWin(object sender, EventArgs args) {
         _gameWon = true;
     }
+
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
+        GameEvents.PlayerWin -= OnPlayerWin;
+    }
 }

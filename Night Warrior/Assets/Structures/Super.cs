@@ -1,11 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Super : MonoBehaviour
 {
     int _count = 0;
     bool _directionUp = false;
+
+    void Awake()
+    {
+        GameEvents.ResetPlayer += OnResetPlayer;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -32,5 +38,13 @@ public class Super : MonoBehaviour
         else {
             _count += 1;
         }
+    }
+
+    void OnResetPlayer(object sender, EventArgs args) {
+        this.gameObject.SetActive(true);
+    }
+
+    void OnDestroy() {
+        GameEvents.ResetPlayer -= OnResetPlayer;
     }
 }
