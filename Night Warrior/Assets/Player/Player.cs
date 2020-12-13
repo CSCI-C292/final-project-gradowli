@@ -27,6 +27,9 @@ public class Player : MonoBehaviour
     bool _directionRight = true;
     bool _gameWon = false;
     int _playerCooldown = 0;
+    AudioSource a0;
+    AudioSource a1;
+    AudioSource a2;
     
 
     void Awake() {
@@ -37,7 +40,11 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        //more help witho audio sources: https://answers.unity.com/questions/175995/can-i-play-multiple-audiosources-from-one-gameobje.html
+        AudioSource[] sources = gameObject.GetComponents<AudioSource>();
+        a0 = sources[0];
+        a1 = sources[1];
+        a2 = sources[2];
     }
 
     // Update is called once per frame
@@ -109,6 +116,7 @@ public class Player : MonoBehaviour
                             }
                             else {
                                 _super = false;
+                                Destroy(collision.collider.gameObject);
                                 _playerCooldown = 50;
                             }
                         }
@@ -148,6 +156,7 @@ public class Player : MonoBehaviour
                             }
                             else {
                                 _super = false;
+                                Destroy(collision.collider.gameObject);
                                 _playerCooldown = 50;
                             }
                         }
@@ -267,7 +276,8 @@ public class Player : MonoBehaviour
             if (! _jumping && _c) {
                 _verticalVelocity = _jumpHeight;
                 _jumping = true;
-                _grounded = false; 
+                _grounded = false;
+                a2.Play(); 
             }
 
             if (_x && _shotCount > 0) {
@@ -282,7 +292,7 @@ public class Player : MonoBehaviour
                     shot.GetComponent<PlayerShot>().GetComponent<SpriteRenderer>().flipX = true;
                 }
                 //Some help in learning how to use Audio Source components: https://www.raywenderlich.com/6449-introduction-to-unity-sound
-                this.gameObject.GetComponent<AudioSource>().Play();
+                a0.Play();
             }
 
             Movement();
@@ -389,6 +399,7 @@ public class Player : MonoBehaviour
                 this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(1).gameObject.transform.position.x - 1,
                                                     collision.collider.transform.parent.GetChild(1).gameObject.transform.position.y, 0);
             }
+            a1.Play();
             return true;
         }
         else if (_portalCooldown == 0 && collision.collider.transform.CompareTag("Portal2")) {
@@ -402,6 +413,7 @@ public class Player : MonoBehaviour
                 this.transform.position = new Vector3(collision.collider.transform.parent.GetChild(0).gameObject.transform.position.x - 1,
                                                     collision.collider.transform.parent.GetChild(0).gameObject.transform.position.y, 0);
             }
+            a1.Play();
             return true;
         }
         else {
